@@ -1,0 +1,34 @@
+<div id="<%= dom_id article %>">
+  <div>
+    <strong>Title:</strong>
+    <%= article.title %>
+  </div>
+
+  <div>
+    <strong>Content:</strong>
+    <div class="markdown-content">
+      <%= markdown(article.content) %>
+    </div>
+  </div>
+
+  <div>
+    <strong>Summary:</strong>
+    <%= article.summary %>
+  </div>
+
+  <div>
+    <strong>Category:</strong>
+    <%= article.category %>
+  </div>
+
+  <div>
+    <strong>Tags:</strong>
+    <%= article.tags %>
+  </div>
+
+  <div>
+    <strong>Published:</strong>
+    <%= article.published ? "公開" : "下書き" %>
+  </div>
+
+</div>
