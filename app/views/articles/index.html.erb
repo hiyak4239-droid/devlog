@@ -2,15 +2,49 @@
 
 <% content_for :title, "Articles" %>
 
-<h1>Articles</h1>
-
-<div id="articles">
-  <% @articles.each do |article| %>
-    <%= render article %>
-    <p>
-      <%= link_to "Show this article", article %>
-    </p>
-  <% end %>
+<div class="page-header">
+  <h1>DevLog</h1>
+  <p class="page-subtitle">プログラミング学習の記録</p>
 </div>
 
-<%= link_to "New article", new_article_path %>
+<div class="articles-actions">
+  <%= link_to "✏️ 新規記事を作成", new_article_path, class: "button button-primary" %>
+</div>
+
+<div id="articles-list">
+  <% if @articles.empty? %>
+    <p class="no-articles">まだ記事がありません</p>
+  <% else %>
+    <% @articles.order(created_at: :desc).each do |article| %>
+      <article class="article-card">
+        <h2 class="article-title">
+          <%= link_to article.title, article %>
+        </h2>
+
+        <div class="article-meta">
+          <span class="article-date">📅 <%= article.created_at.strftime("%Y年%m月%d日") %></span>
+          <% if article.category.present? %>
+            <span class="article-category">📁 <%= article.category %></span>
+          <% end %>
+          <span class="article-status <%= article.published ? 'published' : 'draft' %>">
+            <%= article.published ? "公開" : "下書き" %>
+          </span>
+        </div>
+
+        <% if article.summary.present? %>
+          <p class="article-summary"><%= article.summary %></p>
+        <% end %>
+
+        <% if article.tags.present? %>
+          <div class="article-tags">
+            🏷️ <%= article.tags %>
+          </div>
+        <% end %>
+
+        <div class="article-actions">
+          <%= link_to "続きを読む →", article, class: "read-more" %>
+        </div>
+      </article>
+    <% end %>
+  <% end %>
+</div>

@@ -185,7 +185,149 @@ div[style*="color: red"] ul {
   margin-bottom: 0;
 }
 
+/* ===== ページヘッダー ===== */
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: none;
+}
+
+.page-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+/* ===== 記事アクション ===== */
+.articles-actions {
+  text-align: right;
+  margin-bottom: 2rem;
+}
+
+.button-primary {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.button-primary:hover {
+  background-color: #2980b9;
+  text-decoration: none;
+}
+
 /* ===== 記事一覧 ===== */
+#articles-list {
+  margin: 2rem 0;
+}
+
+.article-card {
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.article-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.article-title {
+  margin: 0 0 1rem 0;
+  border-bottom: none;
+}
+
+.article-title a {
+  color: #2c3e50;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.article-title a:hover {
+  color: #3498db;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.article-date,
+.article-category {
+  display: inline-flex;
+  align-items: center;
+}
+
+.article-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.article-status.published {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.article-status.draft {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.article-summary {
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.article-tags {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.article-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e1e8ed;
+}
+
+.read-more {
+  color: #3498db;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.read-more:hover {
+  color: #2980b9;
+}
+
+.no-articles {
+  text-align: center;
+  color: #999;
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+/* 旧スタイル（詳細ページ用に残す） */
 #articles {
   margin: 2rem 0;
 }
