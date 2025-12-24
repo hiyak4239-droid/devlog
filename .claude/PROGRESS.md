@@ -1,7 +1,7 @@
 # DevLog 開発進捗メモ
 
 **作成日:** 2025-12-23
-**最終更新:** 2025-12-23
+**最終更新:** 2025-12-24
 
 ---
 
@@ -9,8 +9,9 @@
 
 - **アプリ名:** DevLog
 - **目的:** プログラミング学習内容を記事として記録・公開
-- **技術:** Ruby on Rails 8.1.1 + SQLite
+- **技術:** Ruby on Rails 8.1.1 + PostgreSQL（本番）/ SQLite（開発）
 - **参考:** Qiita風の技術ブログ
+- **公開URL:** https://devlog-gm30.onrender.com/articles
 
 **関連ファイル:**
 - 要件定義書: `/home/hiyak3/projects/devlog/DevLog_requirements.md`
@@ -103,175 +104,106 @@
 
 ---
 
-## 🚀 次にやること（フェーズ2: 公開機能とWebデプロイ）
+### フェーズ2: 公開機能とWebデプロイ（完了）
+
+#### 1. 公開記事フィルター機能の実装
+- ✓ Articleモデルに`published`スコープと`draft`スコープを追加
+- ✓ ArticlesController#indexで公開記事のみを新しい順で表示
+- ✓ 下書き記事は一覧に表示されない（直接URLでアクセス可能）
+
+#### 2. 本番環境用の設定
+- ✓ Gemfile: 本番環境用にpg gem追加、開発/テスト環境用にsqlite3を移動
+- ✓ config/database.yml: 本番環境をPostgreSQLに変更（DATABASE_URL使用）
+- ✓ config/environments/production.rb: キャッシュとジョブキューをシンプルなインメモリ設定に変更
+  - solid_cacheからmemory_storeに変更
+  - solid_queueからasyncアダプターに変更
+- ✓ config/cable.yml: solid_cableからasyncアダプターに変更
+- ✓ config/cache.yml: cacheデータベース指定を削除
+
+#### 3. Renderへのデプロイ
+- ✓ Renderアカウント作成（GitHubアカウントで連携）
+- ✓ PostgreSQLデータベース作成（無料プラン）
+- ✓ Web Service作成とGitHubリポジトリ連携
+- ✓ 環境変数設定（DATABASE_URL、RAILS_MASTER_KEY）
+- ✓ デプロイ成功
+- ✓ サンプルデータ投入（一時的なエンドポイント経由）
+
+#### 4. デプロイ後の動作確認
+- ✓ トップページ表示確認
+- ✓ 公開記事のみ表示（フィルター機能動作確認）
+- ✓ 記事詳細ページ表示確認
+- ✓ Markdown表示確認
+- ✓ シンタックスハイライト動作確認
+
+#### 5. トラブルシューティング（発生した問題と解決）
+- **問題1:** `cable`データベース接続エラー
+  - **原因:** solid_cableがcableデータベースに接続しようとしたが、database.ymlから削除していた
+  - **解決:** config/cable.ymlをsolid_cableからasyncアダプターに変更
+- **問題2:** `cache`データベース接続エラー
+  - **原因:** config/cache.ymlでcacheデータベースへの接続が指定されていた
+  - **解決:** config/cache.ymlから`database: cache`の行を削除
+
+---
+
+## 🚀 次にやること（フェーズ3: コメント機能）
 
 ### 現在の状況
-- フェーズ1（MVP機能）完了 ✅
-- ローカル環境で記事のCRUD操作が動作中
-- 次はフェーズ2に進む
+- ✅ フェーズ1（MVP機能）完了
+- ✅ フェーズ2（公開機能とWebデプロイ）完了
+- 🌐 本番環境で公開中: https://devlog-gm30.onrender.com/articles
+- 次はフェーズ3に進む
 
-### フェーズ2の目標
-1. 公開/下書きの切り替え機能を改善
-2. 公開記事のみ表示するフィルター機能
-3. Webへのデプロイ（本番環境公開）
+### フェーズ3の目標
+1. 記事へのコメント投稿機能
+2. コメント一覧表示
+3. コメント削除機能
 
----
+### 実装予定の内容
 
-### ステップ1: 公開機能の改善
+#### 1. Commentモデルの作成
+- テーブル設計:
+  - `article_id` (integer, 外部キー)
+  - `author_name` (string, 必須)
+  - `content` (text, 必須)
+  - `created_at`, `updated_at`
+- アソシエーション: `Article has_many :comments`
 
-**現状:**
-- `published`カラムは既に実装済み（true/false）
-- フォームでチェックボックスで切り替え可能
+#### 2. コメント投稿機能
+- 記事詳細ページにコメントフォームを追加
+- バリデーション追加（author_name、content必須）
+- コメント投稿後は記事詳細ページにリダイレクト
 
-**実装する内容:**
-1. **記事一覧での公開記事フィルター**
-   - デフォルトでは全記事表示
-   - 公開記事のみ表示するオプション追加（将来の一般公開に備えて）
+#### 3. コメント一覧表示
+- 記事詳細ページでコメント一覧を表示
+- 新しい順または古い順で表示
+- コメント数の表示
 
-2. **コントローラの修正**
-   - `ArticlesController#index` に公開記事のみ表示するスコープ追加（オプション）
-
-**ファイル:**
-- `app/models/article.rb`: スコープ追加
-- `app/controllers/articles_controller.rb`: フィルター機能追加（オプション）
-
----
-
-### ステップ2: 本番環境用の設定
-
-**実装する内容:**
-1. **本番環境用データベースの設定**
-   - SQLiteからPostgreSQLへの移行準備
-   - `config/database.yml`の確認・調整
-
-2. **環境変数の設定**
-   - `SECRET_KEY_BASE`などの機密情報管理
-   - `config/credentials.yml.enc`の確認
-
-3. **静的アセットの設定**
-   - Propshaftの設定確認
-   - アセットプリコンパイルの確認
-
-**ファイル:**
-- `config/database.yml`
-- `config/environments/production.rb`
-- `Gemfile` (pg gemの追加)
-
----
-
-### ステップ3: デプロイ先の選定と準備
-
-**候補サービス:**
-
-1. **Render（推奨）**
-   - 無料プランあり
-   - PostgreSQL無料プラン含む
-   - GitHubと連携して自動デプロイ
-   - 設定が比較的簡単
-
-2. **Fly.io**
-   - 無料枠あり
-   - グローバルCDN対応
-   - PostgreSQL対応
-
-3. **Heroku**
-   - 有料（月額$5〜）
-   - 実績豊富だが無料プランなし
-
-**推奨: Render を使用**
-
----
-
-### ステップ4: Renderへのデプロイ手順
-
-#### 4-1. Renderアカウント作成
-1. https://render.com/ にアクセス
-2. GitHubアカウントで登録
-
-#### 4-2. PostgreSQL gem追加
-
-**Gemfileの編集:**
-```ruby
-group :production do
-  gem 'pg'
-end
-
-group :development, :test do
-  gem 'sqlite3', '>= 2.1'
-end
-```
-
-**実行:**
-```bash
-bundle install
-```
-
-#### 4-3. database.ymlの調整
-
-**production環境の設定を確認:**
-```yaml
-production:
-  adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  url: <%= ENV['DATABASE_URL'] %>
-```
-
-#### 4-4. GitHubへプッシュ
-
-```bash
-git add .
-git commit -m "本番環境用の設定を追加"
-git push origin main
-```
-
-#### 4-5. Renderでデプロイ設定
-
-1. Renderダッシュボードで「New Web Service」を選択
-2. GitHubリポジトリを接続
-3. 設定:
-   - **Name**: devlog（任意）
-   - **Environment**: Ruby
-   - **Build Command**: `bundle install; bundle exec rake assets:precompile; bundle exec rake db:migrate`
-   - **Start Command**: `bundle exec puma -C config/puma.rb`
-4. 「Create Web Service」をクリック
-
-#### 4-6. PostgreSQLデータベース作成
-
-1. Renderダッシュボードで「New PostgreSQL」を選択
-2. 無料プランを選択
-3. 作成後、DATABASE_URLをコピー
-4. Web ServiceにDATABASE_URL環境変数を設定
-
-#### 4-7. デプロイ確認
-
-- RenderがデプロイURLを発行
-- `https://devlog-xxxx.onrender.com` 形式
-- アクセスして動作確認
-
----
-
-### ステップ5: デプロイ後の確認事項
-
-**チェックリスト:**
-- [ ] トップページが表示される
-- [ ] 記事の作成・表示・編集・削除が動作する
-- [ ] Markdownが正しく表示される
-- [ ] シンタックスハイライトが動作する
-- [ ] スタイルが適用されている
-- [ ] サンプルデータを投入（`rails db:seed`）
+#### 4. コメント削除機能
+- 各コメントに削除ボタンを追加
+- 削除確認ダイアログの実装
+- 削除後は記事詳細ページにリダイレクト
 
 ---
 
 ## 📊 Gitコミット履歴
 
+### フェーズ1
 1. `ad57188` - 初回コミット: DevLogプロジェクト作成
 2. `342713e` - MVP実装: 記事のCRUD機能とMarkdown表示を追加
 3. `a1786ad` - デザイン改善: CSSとシンタックスハイライトを追加
 4. `0a35545` - 記事一覧ページを簡素化
+5. `b0b07fb` - 進捗メモを更新: フェーズ1完了とフェーズ2の準備
+
+### フェーズ2
+6. `d766313` - 公開記事フィルター機能を追加
+7. `d8eb136` - 本番環境用の設定を追加（PostgreSQL対応）
+8. `716b515` - 本番環境のAction Cable設定を修正
+9. `346349a` - 本番環境のキャッシュ設定を修正
+10. `77d7b33` - 一時的なサンプルデータ投入エンドポイントを追加
+11. `d0e41ef` - 一時的なサンプルデータ投入エンドポイントを削除
 
 **現在のブランチ:** main
-**リモート:** origin/main より3コミット先行中
+**リモート:** origin/main と同期済み
 
 ---
 
@@ -349,12 +281,12 @@ git push origin main
 
 ## 🎯 今後の拡張予定（要件書より）
 
-### フェーズ2: 公開機能とWebデプロイ ← 次回ここから
-- 下書き/公開の切り替え機能の改善
-- 公開記事のみ表示するフィルター
-- Webへのデプロイ（Render推奨）
+### ~~フェーズ2: 公開機能とWebデプロイ~~ ✅ 完了
+- ✅ 下書き/公開の切り替え機能の改善
+- ✅ 公開記事のみ表示するフィルター
+- ✅ Webへのデプロイ（Render）
 
-### フェーズ3: コメント機能
+### フェーズ3: コメント機能 ← 次回ここから
 - 記事へのコメント投稿
 - コメント一覧表示
 - コメント削除
@@ -376,10 +308,26 @@ git push origin main
 2. **要件定義書（DevLog_requirements.md）を確認**（必要に応じて）
 3. **Claude Codeに伝える:**
    - 「DevLogの開発を続けたい」
-   - 「フェーズ2（公開機能とWebデプロイ）から始める」
+   - 「フェーズ3（コメント機能）から始める」
 4. **PROGRESS.mdの「次にやること」を参照しながら進める**
 
 ---
 
-**現在の状況:** フェーズ1（MVP機能）完了 ✅
-**次回の作業:** フェーズ2（公開機能とWebデプロイ）
+## 📌 本番環境情報
+
+**公開URL:** https://devlog-gm30.onrender.com/articles
+**ホスティング:** Render（無料プラン）
+**データベース:** PostgreSQL（Render - 無料プラン）
+**環境変数:**
+- `DATABASE_URL`: PostgreSQL接続URL（Renderが自動設定）
+- `RAILS_MASTER_KEY`: Rails暗号化キー（`config/master.key`の値）
+
+**デプロイ設定:**
+- Build Command: `bundle install; bundle exec rake assets:precompile; bundle exec rake db:migrate`
+- Start Command: `bundle exec puma -C config/puma.rb`
+- Auto-Deploy: 有効（GitHubのmainブランチへのpush時に自動デプロイ）
+
+---
+
+**現在の状況:** フェーズ2（公開機能とWebデプロイ）完了 ✅
+**次回の作業:** フェーズ3（コメント機能）
