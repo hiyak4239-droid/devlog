@@ -12,4 +12,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "articles#index"
+
+  # TEMPORARY: Seed data endpoint (remove after use)
+  get "seed" => "articles#seed", as: :seed_data
 end
