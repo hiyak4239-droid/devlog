@@ -57,12 +57,6 @@ class ArticlesController < ApplicationController
     end
   end
 
-  # TEMPORARY: Seed data action (remove after use)
-  def seed
-    require Rails.root.join('db', 'seeds.rb')
-    render plain: "Sample data has been created! Please remove this endpoint now."
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_article
