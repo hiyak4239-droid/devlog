@@ -327,29 +327,6 @@ div[style*="color: red"] ul {
   font-size: 1.1rem;
 }
 
-/* 旧スタイル（詳細ページ用に残す） */
-#articles {
-  margin: 2rem 0;
-}
-
-#articles > div {
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e1e8ed;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  transition: box-shadow 0.2s;
-}
-
-#articles > div:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-#articles strong {
-  color: #2c3e50;
-  font-weight: 600;
-}
-
 /* ===== 記事詳細 ===== */
 #article_1,
 #article_2,
@@ -423,7 +400,7 @@ div[style*="color: red"] ul {
   border-radius: 3px;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.9em;
-  color: #e83e8c;
+  color: #5c6370;
 }
 
 .markdown-content pre {
@@ -440,6 +417,12 @@ div[style*="color: red"] ul {
   padding: 0;
   font-size: 0.9rem;
   line-height: 1.6;
+  color: #abb2bf;
+}
+
+/* 言語指定がないコードブロックを明るいグレーで表示 */
+.markdown-content pre code:not([class*="language-"]):not([class*="hljs-"]) {
+  color: #abb2bf;
 }
 
 .markdown-content blockquote {
